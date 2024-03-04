@@ -1,5 +1,46 @@
 # Bacillales Genomes Figures
-This repository shows how we made figures from the BGCFlow output-files to be used in the manuscript *121 de novo assembled Bacillales Genomes with varying biosynthetic potential*.
+This repository shows how we identified plasmids and used the outputs from BGCFlow to make the figures for the manuscript *121 de novo assembled Bacillales Genomes with Varying Biosynthetic Potential*.
+
+## Plasmid Identification
+
+### Install and Run RFPlasmid
+RFPlasmid was installed in a new conda environment using mamba:
+~~~bash
+conda create --name rfplasmid
+conda activate rfplasmid
+mamba install -c bioconda rfplasmid
+~~~
+Then, RFPlasmid was executed on the directory [data/genomes/fasta](data/genomes/fasta) containing the 121 assembled genomes in FASTA-format using the following command:
+~~~bash
+rfplasmid --species Bacillus --input data/genomes/fasta --out results/rfplasmid/test_genomes
+~~~
+
+## Add Topology to RFPlasmid Output
+### Extract Topology from Genbank Files
+The topology (linear or circular) of each contig was extracted from the corresponding genbank files. This data was then saved to [topology_output.csv](../../results/topology/test_genomes/topology_output.csv). The extraction was performed using the [get_shape.py](../../src/python/get_shape.py) script:
+~~~bash
+python3 get_shape.py test_genomes/genbank
+~~~
+
+### Join Contig Topology Value with RFPlasmid Prediction
+The process of joining the CSV files containing the topology and plasmid predictions involved two steps:
+
+1. **Adding key column to rfplasmid output**: A "Record ID" column was added to the **'prediction.csv'** file. This was achieved by copying the accession number from the "contigID" column to a new "Record ID" column using the following '**awk**' command:
+~~~bash
+awk -F, 'BEGIN {OFS=","} NR == 1 {print $0, "Record ID"} NR > 1 {split($5,a," "); gsub(/"/, "", a[1]); print $0,a[1]}' prediction.csv > modified_output/prediction.csv
+~~~
+Explanation:
+- '**NR == 1 {print $0, "Record ID"}'**: Adds a new header in the first line. 1 ("NR == 1")
+- **'NR > 1 {split($5,a," "); gsub(/"/, "", a[1]); print $0,a[1]}'**: Processes each line (excluding the first), extracts the first word from the 5th column, removes any double quotes, and appends it as a new column
+
+2. **Joining the RFPlasmid output CSV with the topology CSV:**: The two csv files were joined using **'csvjoin'** command from the csvkit package was used to merge the files. csvkit can be installed installed via **'pip'**:
+~~~bash
+pip install csvkit
+~~~
+Following installation, the files were merged using the command:
+~~~bash
+csvjoin -c "Record ID" topology_output.csv prediction.csv > combined.csv
+~~~
 
 ## antiSMASH Regions per Genus
 
@@ -24,4 +65,3 @@ join -t ',' -1 1 -2 1 data/processed/id_genus.csv data/processed/id_bgccount.csv
 
 The boxplot showing the distributions of antiSMASH regions by genus was made using the jupyter notebook [bgc_counts_figure.ipynb](src/notebooks/bgc_counts_figure.ipynb).
 
-## Plasmid Identification
