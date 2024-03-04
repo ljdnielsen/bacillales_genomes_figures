@@ -1,9 +1,9 @@
 # Bacillales Genomes Figures
 This repository shows how we made figures from the BGCFlow output-files to be used in the manuscript *121 de novo assembled Bacillales Genomes with varying biosynthetic potential*.
 
-## Antismash Regions per Genus
+## antiSMASH Regions per Genus
 
-### Concatanation of antiSMASH Region Counts and Taxonomic Classifications
+### Concatenation of antiSMASH Region Counts and Taxonomic Classifications
 To summarize the distributions of antiSMASH regions by genus in our newly assembled genomes, we first concatenated the columns "genus" from the BGCFlow output-file [gtdbtk.bac120.summary.tsv](data/bgcflow_output/gtdbtk.bac120.summary.tsv) and "bgcs_count" from [df_antismash_7.0.0_summary.csv](data/bgcflow_output/df_antismash_7.0.0_summary.csv), using the accession numbers of the first columns, called "user_genome" and "genome_id" respectively, as keys. This was done in three steps.
 
 First, we extracted the key column and genus column from [gtdbtk.bac120.summary.tsv](data/bgcflow_output/gtdbtk.bac120.summary.tsv), excluding the header row and sorting the ouput using "sort", and saved it to the temporary table [id_genus.csv](data/processed/id_genus_sorted.csv) using the following command:
