@@ -1,38 +1,91 @@
 # Bacillales Genomes Figures
-This repository shows how we identified plasmids and used the outputs from BGCFlow to make the figures for the manuscript *121 de novo assembled Bacillales Genomes with Varying Biosynthetic Potential*.
+This repository shows how we identified plasmids and used the outputs from BGCFlow to make the figures for the manuscript *121 de novo Assembled Bacillales Genomes with Varying Biosynthetic Potential*.
+## Clone the Repository
+To begin, clone this repository to your own machine. This will give you input data, scripts used, and environment packages allowing you to run the analysis. The following command will clone this repository to your directory:
+~~~bash
+git clone https://github.com/ljdnielsen/bacillales_genomes_figures
+~~~
+
+## Download Genomes
+### Create Conda Environment for Data Manipulation
+To avoid conflicts with other programs, create a conda environment for downloading and manipulating data called __bacillales-genomes-data__.
+~~~bash
+conda create -n bacillales-genomes-data
+conda activate bacillales-genomes-data
+mamba install -c bioconda -c conda-forge ncbi-datasets-cli
+mamba install biopython
+mamba install tqdm
+pip install csvkit
+~~~
+Download genomes of the BioProject PRJNA960711. 
+~~~bash
+datasets download genome accession PRJNA960711 --assembly-source GenBank --include gbff,genome --filename data/genomes/PRJNA960711.zip
+~~~
+
+Unzip the folder to the data/genomes directory.
+
+~~~bash
+unzip data/genomes/PRJNA960711.zip -d data/genomes/
+~~~
+
+Move .fna and .gbff files to a fasta and genbank directory respectively with the organize_genomes.sh script.
+
+~~~bash
+bash src/shell/organize_genomes.sh data/genomes/ncbi_datasets/ data/genomes/
+~~~
+
+Remove .zip-folder, NCBI README and ncbi_dataset folder.
+
+~~~bash
+rm -r data/genomes/ncbi_datasets data/genomes/genbank.zip data/genomes/README.md
+~~~
 
 ## Plasmid Identification
-
-### Install and Run RFPlasmid
-We first installed RFPlasmid in a new conda environment using mamba:
+### Create Conda Environment for RFPlasmid
+Deactivate the current environment and create a separate environment for rfplasmid called bacillales-genomes-rfplasmid using the YAML file __scr/env/rfplasmid.yml__, and initialize rfplasmid.
 ~~~bash
-conda create --name rfplasmid
-conda activate rfplasmid
-mamba install -c bioconda rfplasmid
+mamba env create -f src/env/rfplasmid.yaml
+conda activate bacillales-genomes-rfplasmid
+rfplasmid --initialize
 ~~~
-We then executed RFPlasmid on the directory [data/genomes/fasta](data/genomes/fasta) containing the 121 assembled genomes in FASTA-format using the following command resulting in a preliminary prediction for each contig of each genome:
+### Run RFPlasmid on FASTA Files
+
+**Resource Requirements**: RFPlasmid (v.0.0.18) can be ressource intensive. On a basic laptop with 20GB of RAM and 4 processors, processing a batch of three genomes took approximately 4 minutes and 5 seconds. Extrapolating this linearly suggests that processing 121 genomes would take around 2 hours and 41 minutes on a similar system.
+#### Executing RFPlasmid
+
+To perform the preliminary plasmid prediction (excluding topology) for each contig of each genome, we executed RFPlasmid on the [data/genomes/fasta](data/genomes/fasta/) directory containing the 121 assembled genomes in FASTA format. The command used was:
+
 ~~~bash
 rfplasmid --species Bacillus --input data/genomes/fasta --out data/rfplasmid
 ~~~
 
 ### Extract Topology from Genbank Files
-We then extracted the topology (linear or circular) of each contig from the corresponding genbank files using the python script [get_shape.py](../../src/python/get_shape.py) and saved the result to [topology.csv](../../data/topology/topology.csv):
+We then extracted the topology (linear or circular) of each contig from the corresponding genbank files using the python script [get_shape.py](../../src/python/get_shape.py) and saved the result to [topology.csv](../../data/topology/topology.csv).
+
+Deactivate the current environment and activate the environment bacillales-genomes-data:
+
 ~~~bash
-python3 get_shape.py data/genomes/genbank data/topology/topology.csv
+conda deactivate
+conda activate bacillales-genomes-data
+~~~
+
+#### Run get_shape.py to extract contig topologies
+Contig topologies were extracted to a table by executing the custom python script get_shape.py with the following command:
+
+~~~bash
+python3 src/python/get_shape.py data/genomes/genbank data/topology/topology.csv
 ~~~
 
 ### Join Contig Topology Value with RFPlasmid Prediction
-The process of joining the CSV files containing the topology and plasmid predictions involved two steps:
+To identify plasmids based on the rfplasmid prediction and contig topology we combined plasmid predictions of prediction.csv with the topologies of topology.csv. This invovled two steps:
 
-1. **Adding key column to rfplasmid output**: A "Record ID" column was added to the **'prediction.csv'** file. This was achieved by copying the accession number from the "contigID" column to a new "Record ID" column using the following '**awk**' command:
+1. **Added a key column to rfplasmid output**: A "Record ID" column was added to **'prediction.csv'** from RFPlasmid using the following '**awk**' command:
 ~~~bash
-awk -F, 'BEGIN {OFS=","} NR == 1 {print $0, "Record ID"} NR > 1 {split($5,a," "); gsub(/"/, "", a[1]); print $0,a[1]}' prediction.csv > modified_output/prediction.csv
+awk -F, 'BEGIN {OFS=","} NR == 1 {print "Record ID", $0} NR > 1 {split($5,a," "); gsub(/"/, "", a[1]); print a[1],$0}' data/rfplasmid/prediction.csv > data/rfplasmid/prediction_withkey.csv
 ~~~
-Explanation:
-- '**NR == 1 {print $0, "Record ID"}'**: Adds a new header in the first line. 1 ("NR == 1")
-- **'NR > 1 {split($5,a," "); gsub(/"/, "", a[1]); print $0,a[1]}'**: Processes each line (excluding the first), extracts the first word from the 5th column, removes any double quotes, and appends it as a new column
+For explanation see [^1].
 
-2. **Joining the RFPlasmid output CSV with the topology CSV:**: The two csv files were joined using **'csvjoin'** command from the csvkit package was used to merge the files. csvkit can be installed installed via **'pip'**:
+2. **Joining prediction_withkey.csv and topology.csv:**: The two csv files were joined using the **'csvjoin'** command from the csvkit package. csvkit can be installed installed in the with **'pip'**:
 ~~~bash
 pip install csvkit
 ~~~
@@ -64,3 +117,5 @@ join -t ',' -1 1 -2 1 data/antismash_regions/id_genus.csv data/antismash_regions
 
 The boxplot showing the distributions of antiSMASH regions by genus was made using the jupyter notebook [bgc_counts_figure.ipynb](src/notebooks/bgc_counts_figure.ipynb).
 
+
+[^1]:'**NR == 1 {print $0, "Record ID"}'**: Adds a new header in the first line. 1 ("NR == 1"). **'NR > 1 {split($5,a," "); gsub(/"/, "", a[1]); print $0,a[1]}'**: Processes each line (excluding the first), extracts the first word from the 5th column, removes any double quotes, and appends it as a new column

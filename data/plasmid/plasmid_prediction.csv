@@ -1,0 +1,4 @@
+File,Record ID,Topology,b,prediction,votes chromosomal,votes plasmid,contigID
+GCA_030122745.1.gbff,CP126077.1,circular,GCA_030122745.1_1,c,0.821,0.179,"CP126077.1 Virgibacillus halodenitrificans strain ACCC02857 chromosome, complete genome"
+GCA_030122765.1.gbff,CP126078.1,circular,GCA_030122765.1_1,c,0.9768,0.0232,"CP126078.1 Brevibacillus agri strain ACCC03016 chromosome, complete genome"
+GCA_030122785.1.gbff,CP126079.1,circular,GCA_030122785.1_1,c,0.9868,0.0132,"CP126079.1 Paenibacillus polymyxa strain ACCC03434 chromosome, complete genome"

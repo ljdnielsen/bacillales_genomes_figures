@@ -21,7 +21,7 @@ def process_folder(folder_path, output_file):
         writer.writerow(['File', 'Record ID', 'Topology'])
 
         for filename in tqdm(os.listdir(folder_path)): # tqdm() supplies progress bar
-            if filename.endswith('.gb') or filename.endswith('.gbk'):
+            if filename.endswith('.gb') or filename.endswith('.gbk') or filename.endswith('.gbff'):
                 full_path = os.path.join(folder_path, filename)
                 for record_id, topology in extract_topology(full_path):
                     writer.writerow([filename, record_id, topology])
