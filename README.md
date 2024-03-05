@@ -1,6 +1,6 @@
 # Documentation for Bacillales Genomes Figures
 
-This repository documents the underlying commands and scripts used for producing the figures for the manuscript *121 de novo Assembled Bacillales Genomes with Varying Biosynthetic Potential*. Specifically it shows how the *BGCFlow* output, included here in the folder [bgcflow_output](data/bgcflow_output/), was processed for generating figures, including the identification of plasmids for decorating the phylogenetic tree.
+This repository documents the commands and scripts used for producing the figures for the manuscript *121 de novo Assembled Bacillales Genomes with Varying Biosynthetic Potential*. Specifically it shows how the *BGCFlow* output, included here in the folder [bgcflow_output](data/bgcflow_output/), was processed for generating figures, including the identification of plasmids for decorating the phylogenetic tree.
 
 ## Setting Up Your System for Replicating the Analysis
 
@@ -17,7 +17,7 @@ conda install mamba -c conda-forge
 *For more information on Mamba, visit [Mamba's GitHub page](https://github.com/mamba-org/mamba?tab=readme-ov-file).*
 ___
 
-To run the workflow, two conda environments need to be created and the genomes in FASTA and GenBank format needs to be downloaded. This section will show how to set up this repository on your own machine, including how to download the genomes.
+__To run the workflow, two conda environments need to be created and the genomes in FASTA and GenBank format needs to be downloaded. This section will show how to set up this repository on your own machine, including how to download the genomes.__
 
 ### Cloning this Repository
 
@@ -49,10 +49,10 @@ mamba install tqdm
 pip install csvkit
 ~~~
 
-This environment contains the NCBI Datasets client for downloading genomes from NCBI, the CSV manipulation tool csvkit, and the python libraries BioPython and tqdm needed for the custom python script that extracts the contig topologies from genbank files.
+This environment contains the NCBI Datasets client for downloading genomes from NCBI, the CSV manipulation tool 'csvkit', and the python libraries 'BioPython' and 'tqdm' needed for the custom python script that extracts the contig topologies from genbank files.
 
 #### bacillales-genomes-rfplasmid Environment:
-To avoid conflicts with other programs, create a separate environment for RFPlasmid. Deactivate the current environment and create an environment called bacillales-genomes-rfplasmid using the YAML file __src/env/rfplasmid.yml__, and initialize rfplasmid:
+To avoid conflicts with other programs, create a separate environment for RFPlasmid. Deactivate the current environment and create an environment called bacillales-genomes-rfplasmid using the YAML file 'src/env/rfplasmid.yml', and initialize rfplasmid:
 
 ~~~bash
 conda deactivate
@@ -82,7 +82,7 @@ Unzip the folder to the data/genomes directory.
 unzip data/genomes/PRJNA960711.zip -d data/genomes/
 ~~~
 
-Organize the downloaded fasta and genbank files in designated directories with the __organize_genomes.sh__ script which creates a fasta and genbank directory in the output directory, moves fasta and genbank files from the input directory to those directories, and renames the files according to their accession numbers.
+Organize the downloaded fasta and genbank files in designated directories with the 'organize_genomes.sh' script which creates a fasta and genbank directory in the output directory, moves fasta and genbank files from the input directory to those directories, and renames the files according to their accession numbers.
 
 ~~~bash
 bash src/shell/organize_genomes.sh data/genomes/ncbi_dataset data/genomes
