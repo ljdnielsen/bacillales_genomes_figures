@@ -1,11 +1,11 @@
 # Bacillales Genomes Figures
 This repository shows how we identified plasmids and used the outputs from BGCFlow to make the figures for the manuscript *121 de novo Assembled Bacillales Genomes with Varying Biosynthetic Potential*.
 ## Clone the Repository
-To begin, clone this repository to your own machine. This will give you input data, scripts used, and environment packages allowing you to run the analysis. The following command will clone this repository to your current directory:
+To begin, clone this repository to your own machine. This will give you the necessary input data, scripts and environment packages for this part of the analysis. The following command will clone this repository to your current directory:
 ~~~bash
 git clone https://github.com/ljdnielsen/bacillales_genomes_figures
 ~~~
-change to the directory:
+Change to the directory:
 ~~~bash
 cd bacillales_genomes_figures
 ~~~
@@ -21,7 +21,7 @@ mamba install biopython
 mamba install tqdm
 pip install csvkit
 ~~~
-### Download genomes of BioProject PRJNA960711 (2.0GB)
+### Download Genomes of BioProject PRJNA960711 (2.0GB)
 Use the datasets command to download the genomes with the following command:
 ~~~bash
 datasets download genome accession PRJNA960711 --assembly-source GenBank --include gbff,genome --filename data/genomes/PRJNA960711.zip
@@ -33,7 +33,7 @@ Unzip the folder to the data/genomes directory.
 unzip data/genomes/PRJNA960711.zip -d data/genomes/
 ~~~
 
-Move .fna and .gbff files to a fasta and genbank directory respectively with the organize_genomes.sh script.
+Organize the downloaded fasta and genbank files in designated directories with the organize_genomes.sh script which creates a fasta and genbank directory in the output_directory, moves fasta and genbank files from the input directory to those directories and renames the files according to their accession numbers.
 
 ~~~bash
 bash src/shell/organize_genomes.sh data/genomes/ncbi_dataset data/genomes
@@ -42,21 +42,21 @@ bash src/shell/organize_genomes.sh data/genomes/ncbi_dataset data/genomes
 Remove .zip-folder, NCBI README and ncbi_dataset folder.
 
 ~~~bash
-rm -r data/genomes/ncbi_datasets data/genomes/PRJNA960711.zip data/genomes/README.md
+rm -r data/genomes/ncbi_dataset data/genomes/PRJNA960711.zip data/genomes/README.md
 ~~~
 
 ## Plasmid Identification
 ### Create Conda Environment for RFPlasmid
-Deactivate the current environment and create a separate environment for rfplasmid called bacillales-genomes-rfplasmid using the YAML file __scr/env/rfplasmid.yml__, and initialize rfplasmid.
+Deactivate the current environment and create a separate environment for rfplasmid called bacillales-genomes-rfplasmid using the YAML file __src/env/rfplasmid.yml__, and initialize rfplasmid.
 ~~~bash
 conda deactivate
-mamba env create -f src/env/rfplasmid.yaml
+mamba env create -f src/env/rfplasmid.yml
 conda activate bacillales-genomes-rfplasmid
 rfplasmid --initialize
 ~~~
 ### Run RFPlasmid on FASTA Files
 
-**Resource Requirements**: RFPlasmid (v.0.0.18) can be ressource intensive. On a basic laptop with 20GB of RAM and 4 processors, processing a batch of three genomes took approximately 4 minutes and 5 seconds. Extrapolating this linearly suggests that processing 121 genomes would take around 2 hours and 41 minutes on a similar system.
+**Resource Requirements**: RFPlasmid (v.0.0.18) can be resource intensive. On a basic laptop with 20GB of RAM and 4 processors, processing a batch of three genomes took approximately 4 minutes and 5 seconds. Extrapolating this linearly suggests that processing 121 genomes would take around 2 hours and 41 minutes on a similar system.
 #### Executing RFPlasmid
 
 To perform the preliminary plasmid prediction (excluding topology) for each contig of each genome, we executed RFPlasmid on the [data/genomes/fasta](data/genomes/fasta/) directory containing the 121 assembled genomes in FASTA format using the following command:
@@ -86,19 +86,12 @@ python3 src/python/get_shape.py data/genomes/genbank data/plasmids/topology/topo
 ### Join Contig Topology Value with RFPlasmid Prediction
 To identify plasmids based on the rfplasmid prediction and contig topology we combined plasmid predictions of prediction.csv with the topologies of topology.csv. This invovled two steps:
 
-1. **Added a key column to rfplasmid output**: A "Record ID" column was added to **'prediction.csv'** from RFPlasmid using the following '**awk**' command:
+1. **Added a key column to rfplasmid output**: A "Record ID" column was added to **'prediction.csv'** from RFPlasmid using the following '**awk**' command, which adds "Record ID" first in the header line (NR == 1 {print "Record ID", $0}), splits the fifth column value to isolate the Record ID from the value and prints it at the front of each line under the "Record ID" header (NR > 1 {split($5,a," "); gsub(/"/, "", a[1]); print a[1],$0}) :
 ~~~bash
 awk -F, 'BEGIN {OFS=","} NR == 1 {print "Record ID", $0} NR > 1 {split($5,a," "); gsub(/"/, "", a[1]); print a[1],$0}' data/plasmids/rfplasmid/prediction.csv > data/plasmids/rfplasmid/prediction_withkey.csv
 ~~~
-For explanation of awk command see [^1].
 
 2. **Joining prediction_withkey.csv and topology.csv:** The two CSV files were joined using the **'csvjoin'** command from the csvkit package:
-
-Install csvkit in the current environment:
-~~~bash
-pip install csvkit
-~~~
-The files were merged with csvjoin using the following command:
 ~~~bash
 csvjoin -c "Record ID" data/plasmids/topology/topology.csv data/plasmids/rfplasmid/prediction_withkey.csv > data/plasmids/plasmid_predictions.csv
 ~~~
@@ -128,6 +121,3 @@ join -t ',' -1 1 -2 1 data/bgcflow_output/temp/id_genus.csv data/bgcflow_output/
 ### Visualization of Counts in Boxplot
 
 The boxplot showing the distributions of antiSMASH regions by genus was made using the jupyter notebook [bgc_counts_figure.ipynb](src/notebooks/bgc_counts_figure.ipynb).
-
-
-[^1]:'**NR == 1 {print $0, "Record ID"}'**: Adds a new header in the first line. 1 ("NR == 1"). **'NR > 1 {split($5,a," "); gsub(/"/, "", a[1]); print $0,a[1]}'**: Processes each line (excluding the first), extracts the first word from the 5th column, removes any double quotes, and appends it as a new column
