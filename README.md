@@ -1,6 +1,6 @@
 # Documentation for Bacillales Genomes Figures
 
-This repository documents the commands and scripts used for producing the figures for the manuscript *121 de novo Assembled Bacillales Genomes with Varying Biosynthetic Potential*. Specifically it shows how the *BGCFlow* output, included here in the folder [bgcflow_output](data/bgcflow_output/), was processed for generating figures, including the identification of plasmids for decorating the phylogenetic tree.
+This repository documents the commands and scripts used for producing the figures for the manuscript *Expanding the genome information on Bacillales for biosynthetic gene cluster discovery*. Specifically it shows how the *BGCFlow* output, included here in the folder [bgcflow_output](data/bgcflow_output/), was processed for generating figures, including the identification of plasmids for decorating the phylogenetic tree.
 
 ## Setting Up Your System for Replicating the Analysis
 
