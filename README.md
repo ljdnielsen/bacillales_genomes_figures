@@ -135,13 +135,14 @@ To identify plasmids based on the rfplasmid prediction and contig topology we co
 ~~~bash
 awk -F, 'BEGIN {OFS=","} NR == 1 {print "Record ID", $0} NR > 1 {split($5,a," "); gsub(/"/, "", a[1]); print a[1],$0}' data/plasmids/rfplasmid/prediction.csv > data/plasmids/rfplasmid/prediction_withkey.csv
 ~~~
+Resulting in the [prediction_withkey.csv](data/plasmids/rfplasmid/prediction_withkey.csv) file.
 
 2. **Then we joined prediction_withkey.csv and topology.csv:** The two CSV files were joined on the key column using the **'csvjoin'** command from the csvkit package:
 ~~~bash
 csvjoin -c "Record ID" data/plasmids/topology/topology.csv data/plasmids/rfplasmid/prediction_withkey.csv > data/plasmids/plasmid_predictions.csv
 ~~~
 
-This resulted in the file [plasmid_prediction.csv](data/plasmids/plasmid_predictions.csv). The contigs that were both circular and predicted to be plasmid as indicated in this table were summed up for each strain, and the numbers used to decorate the phylogenetic tree [final.newick](data/bgcflow_output/final.newick) using iToL, available at [https://itol.embl.de/](https://itol.embl.de/), to produce the final tree figure.
+This resulted in the file [plasmid_prediction.csv](data/plasmids/plasmid_predictions.csv). The contigs that were both circular and predicted to be plasmid as indicated in this table were summed up for each strain, and the numbers used to decorate the phylogenetic tree [final.newick](data/bgcflow_output/final.newick) using [iToL](https://itol.embl.de/), to produce the final tree figure.
 
 ### Boxplot of antiSMASH Regions per Genus
 
