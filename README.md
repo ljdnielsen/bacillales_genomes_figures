@@ -47,6 +47,9 @@ mamba install -c bioconda -c conda-forge ncbi-datasets-cli
 mamba install biopython
 mamba install tqdm
 pip install csvkit
+mamba install -c conda-forge jupyterlab
+mamba install seaborn
+mamba install colorcet
 ~~~
 
 This environment contains the NCBI Datasets client for downloading genomes from NCBI, the CSV manipulation tool 'csvkit', and the python libraries 'BioPython' and 'tqdm' needed for the custom python script that extracts the contig topologies from genbank files.
@@ -73,6 +76,7 @@ conda activate bacillales-genomes-data
 
 Use the datasets command from the NCBI Datasets client to download the genomes with the following command:
 ~~~bash
+mkdir data/genomes
 datasets download genome accession PRJNA960711 --assembly-source GenBank --include gbff,genome --filename data/genomes/PRJNA960711.zip
 ~~~
 
@@ -153,6 +157,7 @@ To summarize the distributions of antiSMASH regions by genus, we first concatena
 1. First, we extracted the key column and genus column from [gtdbtk.bac120.summary.tsv](data/bgcflow_output/gtdbtk.bac120.summary.tsv), excluding the header row and sorting the ouput using "sort", and saved it to the temporary table [id_genus.csv](data/bgcflow_output/temp/id_genus_sorted.csv) using the following command:
 
 ~~~bash
+mkdir data/bgcflow_output/temp
 awk -F'[;\t]' 'NR>1 {print $1","$7}' data/bgcflow_output/gtdbtk.bac120.summary.tsv | sort > data/bgcflow_output/temp/id_genus.csv
 ~~~
 2. Then, we extracted the key column and "bgc_count" column and sorted the output of [df_antismash_7.0.0.summary.csv](data/bgcflow_output/df_antismash_7.0.0_summary.csv) using the command:
@@ -169,4 +174,9 @@ The resulting table [genus_bgccount.csv](data/bgcflow_output/genus_bgccount.csv)
 
 #### Visualization of Counts in Boxplot:
 
-The boxplot showing the distributions of antiSMASH regions by genus was made using the Jupyter notebook [bgc_counts_figure.ipynb](src/notebooks/bgc_counts_figure.ipynb).
+The boxplot showing the distributions of antiSMASH regions by genus was made using the Jupyter notebook [bgc_counts_figure.ipynb](src/notebooks/bgc_counts_figure.ipynb). Either open the file src/notebooks/bgc_counts_figure.ipynb in Visual Studio Code and choose the bacillales-genomes-data environment as the kernel environment, or if you are using another development environment, run 'jupyter lab' and navigate to the src/notebooks/bgc_counts_figure.ipynb from jupyter in the browser that will open:
+~~~bash
+mkdir -p results/figures
+jupyter lab
+~~~
+From the notebook in jupyter lab, run the cells to produce the boxplot showing the distribution of antiSMASH-regions by genus.
