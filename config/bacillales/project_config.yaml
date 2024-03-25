@@ -1,0 +1,30 @@
+name: bacillales
+
+pep_version: 2.1.0
+
+description: "Bacillales"
+
+sample_table: samples.csv
+
+#### RULE CONFIGURATION ####
+# rules: set value to TRUE if you want to run the analysis or FALSE if you don't
+rules:
+  seqfu: FALSE
+  mash: FALSE
+  fastani: FALSE
+  checkm: FALSE
+  gtdbtk: TRUE
+  prokka-gbk: FALSE
+  antismash: TRUE
+  query-bigslice: FALSE
+  bigscape: TRUE
+  bigslice: FALSE
+  automlst-wrapper: TRUE
+  arts: FALSE
+  roary: FALSE
+  eggnog: FALSE
+  eggnog-roary: FALSE
+  deeptfactor: FALSE
+  deeptfactor-roary: FALSE
+  cblaster-genome: FALSE
+  cblaster-bgc: FALSE

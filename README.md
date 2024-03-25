@@ -180,3 +180,32 @@ mkdir -p results/figures
 jupyter lab
 ~~~
 From the notebook in jupyter lab, run the cells to produce the boxplot showing the distribution of antiSMASH-regions by genus.
+
+## Re-running BGCFlow
+We have provided the necessary `BGCFlow` output in the `data` folder. Only run this section if you wanted to reproduce the `BGCFlow` run, or wanted to update the analysis with the latest version of `antiSMASH` or `BGCFlow`.
+
+### Setting Up BGCFlow
+In this section, we will download and set up BGCFlow:
+
+```bash
+# Set up BGCFlow version
+BGCFLOW_VERSION="v0.7.1"
+
+# Define the directory name for the unzipped BGCFlow folder
+BGCFLOW_DIR="bgcflow-${BGCFLOW_VERSION/v/}" # The 'v' in the version number is removed because the unzipped folder does not include it
+
+# Download the zip file for the specified BGCFlow version from GitHub
+wget https://github.com/NBChub/bgcflow/archive/refs/tags/$BGCFLOW_VERSION.zip
+
+# Unzip the downloaded file
+unzip $BGCFLOW_VERSION.zip
+
+# Create a symbolic link to the config directory
+(cd $BGCFLOW_DIR/ && ln -s ../config/ config)
+```
+
+### Running BGCFlow
+Then, we can run the script belo to run BGCFlow on the data. The -n flag is used for a dry-run, which means the command will only print what it would do without actually executing it.
+```bash
+(cd $BGCFLOW_DIR/ && bgcflow run -n) # remove the -n (dry-run)
+```
