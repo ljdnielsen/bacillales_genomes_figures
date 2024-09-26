@@ -43,13 +43,13 @@ Create a conda environment for downloading and manipulating data called __bacill
 conda deactivate
 conda create -n bacillales-genomes-data
 conda activate bacillales-genomes-data
-mamba install -c bioconda -c conda-forge ncbi-datasets-cli
-mamba install biopython
-mamba install tqdm
+mamba install -c bioconda -c conda-forge ncbi-datasets-cli -y
+mamba install biopython -y
+mamba install tqdm -y
 pip install csvkit
-mamba install -c conda-forge jupyterlab
-mamba install seaborn
-mamba install colorcet
+mamba install -c conda-forge jupyterlab -y
+mamba install seaborn -y
+mamba install colorcet -y
 ~~~
 
 This environment contains the NCBI Datasets client for downloading genomes from NCBI, the CSV manipulation tool 'csvkit', and the python libraries 'BioPython' and 'tqdm' needed for the custom python script that extracts the contig topologies from genbank files.
@@ -209,3 +209,14 @@ Then, we can run the script belo to run BGCFlow on the data. The -n flag is used
 ```bash
 (cd $BGCFLOW_DIR/ && bgcflow run -n) # remove the -n (dry-run)
 ```
+
+## Assessing Base Accuracy
+
+To assess the base accuracy, we follow the k-mer based accuracy assessment following the protocol from https://www.nature.com/articles/s41586-023-05896-x.
+To perform the assessment, run using Snakemake:
+
+```bash
+snakemake --snakefile workflow/Snakefile --use-conda --keep-going --rerun-incomplete --rerun-triggers mtime -c 8
+```
+
+This will download the assembly Fasta and the Fastq SRAs, and use the short read to calculate the base accuracy of the assembly.
