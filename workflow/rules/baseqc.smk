@@ -9,10 +9,13 @@ rule download_sra:
     log:
         "logs/download_sra/fastq_{strain}_download_sra.log"
     threads: 2
+    params:
+        tmpdir = "data/interim/sra/tmp"
     shell:
         """
         echo "Downloading SRA for {wildcards.strain}: {params.ont} {params.dnb}" > {log}
-        fasterq-dump {params.ont} {params.dnb} -O {output} --split-files --threads {threads} -v 2>> {log}
+        mkdir -p {params.tmpdir}
+        fasterq-dump {params.ont} {params.dnb} -O {output} --split-files --threads {threads} -t {params.tmpdir} -v 2>> {log}
         """
 
 rule download_assembly:
