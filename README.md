@@ -220,3 +220,8 @@ snakemake --snakefile workflow/Snakefile --use-conda --keep-going --rerun-incomp
 ```
 
 This will download the assembly Fasta and the Fastq SRAs, and use the short read to calculate the base accuracy of the assembly.
+The k-mer size for the Yak `kcount` parameter is calculated using the [script from Merqury](https://github.com/marbl/merqury/wiki/1.-Prepare-meryl-dbs#1-get-the-right-k-size):
+
+```bash
+sh $MERQURY/best_k.sh <genome_size> [tolerable_collision_rate=0.001]
+```

@@ -6,9 +6,11 @@ rule download_sra:
     params:
         ont = lambda wildcards: df.loc[wildcards.strain, "SRA accession of Nanopore"],
         dnb = lambda wildcards: df.loc[wildcards.strain, "SRA accession of DNBSEQ"],
-        tmpdir = "data/interim/sra/tmp"
+        tmpdir = "data/interim/sra/tmp/"
     log:
         "logs/download_sra/fastq_{strain}_download_sra.log"
+    resources:
+        tmpdir="data/interim/sra/tmp/",
     threads: 2
     shell:
         """
