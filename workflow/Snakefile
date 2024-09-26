@@ -1,0 +1,14 @@
+import pandas as pd
+from pathlib import Path
+
+df = pd.read_csv("config/bacillales/Supplementary_Table_4.tsv", sep="\t").set_index("GenBank assembly")
+df = df.loc[:, ["SRA accession of Nanopore", "SRA accession of DNBSEQ"]].fillna("")
+
+STRAINS = df.index.tolist()
+
+rule all:
+    input:
+        expand("data/processed/yak/{strain}/asm-sr.qv.txt", strain=STRAINS),
+        #expand("data/processed/merqury/{strain}/merqury", strain=STRAINS)
+
+include: "rules/baseqc.smk"
