@@ -5,3 +5,4 @@ data/
 .snakemake
 resources
 logs/
+**/.ipynb_checkpoints/

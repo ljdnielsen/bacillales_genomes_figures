@@ -40,16 +40,8 @@ cd bacillales_genomes_figures
 Create a conda environment for downloading and manipulating data called __bacillales-genomes-data__ by running these commands:
 
 ~~~bash
-conda deactivate
-conda create -n bacillales-genomes-data -y
+mamba env create -f env.yaml
 conda activate bacillales-genomes-data
-mamba install -c bioconda -c conda-forge ncbi-datasets-cli -y
-mamba install biopython -y
-mamba install tqdm -y
-pip install csvkit
-mamba install -c conda-forge jupyterlab -y
-mamba install seaborn -y
-mamba install colorcet -y
 ~~~
 
 This environment contains the NCBI Datasets client for downloading genomes from NCBI, the CSV manipulation tool 'csvkit', and the python libraries 'BioPython' and 'tqdm' needed for the custom python script that extracts the contig topologies from genbank files.
