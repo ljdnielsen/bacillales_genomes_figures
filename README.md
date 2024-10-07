@@ -41,7 +41,7 @@ Create a conda environment for downloading and manipulating data called __bacill
 
 ~~~bash
 conda deactivate
-conda create -n bacillales-genomes-data
+conda create -n bacillales-genomes-data -y
 conda activate bacillales-genomes-data
 mamba install -c bioconda -c conda-forge ncbi-datasets-cli -y
 mamba install biopython -y
@@ -216,12 +216,12 @@ To assess the base accuracy, we follow the k-mer based accuracy assessment follo
 To perform the assessment, run using Snakemake:
 
 ```bash
+# install snakemake with:
+# mamba install -c conda-forge -c bioconda snakemake
 snakemake --snakefile workflow/Snakefile --use-conda --keep-going --rerun-incomplete --rerun-triggers mtime -c 8
 ```
 
 This will download the assembly Fasta and the Fastq SRAs, and use the short read to calculate the base accuracy of the assembly.
-The k-mer size for the Yak `kcount` parameter is calculated using the [script from Merqury](https://github.com/marbl/merqury/wiki/1.-Prepare-meryl-dbs#1-get-the-right-k-size):
 
-```bash
-sh $MERQURY/best_k.sh <genome_size> [tolerable_collision_rate=0.001]
-```
+## Running the notebooks
+To run the Jupyter notebooks, start the server by running `jupyter lab`.
