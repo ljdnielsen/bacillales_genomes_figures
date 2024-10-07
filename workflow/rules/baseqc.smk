@@ -48,9 +48,9 @@ rule yak:
     log:
         "logs/yak/yak_{strain}.log"
     params:
-        yak_dir = "data/interim/yak/{strain}",
+        yak_dir = "data/interim/yak_b31/{strain}",
         kcount = "16",
-        b = "37",
+        b = "31",
         kqv = "6m",
         lqv = "100k",
         ont = lambda wildcards: df.loc[wildcards.strain, "SRA accession of Nanopore"],
