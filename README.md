@@ -40,16 +40,8 @@ cd bacillales_genomes_figures
 Create a conda environment for downloading and manipulating data called __bacillales-genomes-data__ by running these commands:
 
 ~~~bash
-conda deactivate
-conda create -n bacillales-genomes-data
+mamba env create -f env.yaml
 conda activate bacillales-genomes-data
-mamba install -c bioconda -c conda-forge ncbi-datasets-cli
-mamba install biopython
-mamba install tqdm
-pip install csvkit
-mamba install -c conda-forge jupyterlab
-mamba install seaborn
-mamba install colorcet
 ~~~
 
 This environment contains the NCBI Datasets client for downloading genomes from NCBI, the CSV manipulation tool 'csvkit', and the python libraries 'BioPython' and 'tqdm' needed for the custom python script that extracts the contig topologies from genbank files.
@@ -111,6 +103,7 @@ The following section documents the use of RFPlasmid for finding plasmids and th
 To perform the preliminary plasmid prediction (excluding topology) for each contig of each genome, we executed RFPlasmid on the [data/genomes/fasta](data/genomes/fasta/) directory containing the 121 assembled genomes in FASTA format using the following command:
 
 ~~~bash
+mkdir -p data/plasmids/rfplasmid
 rfplasmid --species Bacillus --input data/genomes/fasta --out data/plasmids/rfplasmid
 ~~~
 
@@ -127,6 +120,7 @@ conda activate bacillales-genomes-data
 We then extracted the topology (linear or circular) of each contig from the corresponding genbank files using the python script [get_shape.py](../../src/python/get_shape.py):
 
 ~~~bash
+mkdir -p data/plasmids/topology
 python3 src/python/get_shape.py data/genomes/genbank data/plasmids/topology/topology.csv
 ~~~
 
@@ -157,7 +151,7 @@ To summarize the distributions of antiSMASH regions by genus, we first concatena
 1. First, we extracted the key column and genus column from [gtdbtk.bac120.summary.tsv](data/bgcflow_output/gtdbtk.bac120.summary.tsv), excluding the header row and sorting the ouput using "sort", and saved it to the temporary table [id_genus.csv](data/bgcflow_output/temp/id_genus_sorted.csv) using the following command:
 
 ~~~bash
-mkdir data/bgcflow_output/temp
+mkdir -p data/bgcflow_output/temp
 awk -F'[;\t]' 'NR>1 {print $1","$7}' data/bgcflow_output/gtdbtk.bac120.summary.tsv | sort > data/bgcflow_output/temp/id_genus.csv
 ~~~
 2. Then, we extracted the key column and "bgc_count" column and sorted the output of [df_antismash_7.0.0.summary.csv](data/bgcflow_output/df_antismash_7.0.0_summary.csv) using the command:
@@ -209,3 +203,19 @@ Then, we can run the script belo to run BGCFlow on the data. The -n flag is used
 ```bash
 (cd $BGCFLOW_DIR/ && bgcflow run -n) # remove the -n (dry-run)
 ```
+
+## Assessing Base Accuracy
+
+To assess the base accuracy, we follow the k-mer based accuracy assessment following the protocol from https://www.nature.com/articles/s41586-023-05896-x.
+To perform the assessment, run using Snakemake:
+
+```bash
+# install snakemake with:
+# mamba install -c conda-forge -c bioconda snakemake
+snakemake --snakefile workflow/Snakefile --use-conda --keep-going --rerun-incomplete --rerun-triggers mtime -c 8
+```
+
+This will download the assembly Fasta and the Fastq SRAs, and use the short read to calculate the base accuracy of the assembly.
+
+## Running the notebooks
+To run the Jupyter notebooks, start the server by running `jupyter lab` and access the notebooks in the `src/notebooks` directory.

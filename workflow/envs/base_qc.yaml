@@ -1,0 +1,17 @@
+name: base_qc
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - yak
+  - sra-tools
+  - biopython
+  - jupyterlab
+  - pandas
+  - pip
+  - python=3.11
+  - entrez-direct
+  - ncbi-datasets-cli
+  - meryl
+  - merqury
