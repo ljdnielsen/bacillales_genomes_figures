@@ -103,6 +103,7 @@ The following section documents the use of RFPlasmid for finding plasmids and th
 To perform the preliminary plasmid prediction (excluding topology) for each contig of each genome, we executed RFPlasmid on the [data/genomes/fasta](data/genomes/fasta/) directory containing the 121 assembled genomes in FASTA format using the following command:
 
 ~~~bash
+mkdir -p data/plasmids/rfplasmid
 rfplasmid --species Bacillus --input data/genomes/fasta --out data/plasmids/rfplasmid
 ~~~
 
@@ -119,6 +120,7 @@ conda activate bacillales-genomes-data
 We then extracted the topology (linear or circular) of each contig from the corresponding genbank files using the python script [get_shape.py](../../src/python/get_shape.py):
 
 ~~~bash
+mkdir -p data/plasmids/topology
 python3 src/python/get_shape.py data/genomes/genbank data/plasmids/topology/topology.csv
 ~~~
 
@@ -149,7 +151,7 @@ To summarize the distributions of antiSMASH regions by genus, we first concatena
 1. First, we extracted the key column and genus column from [gtdbtk.bac120.summary.tsv](data/bgcflow_output/gtdbtk.bac120.summary.tsv), excluding the header row and sorting the ouput using "sort", and saved it to the temporary table [id_genus.csv](data/bgcflow_output/temp/id_genus_sorted.csv) using the following command:
 
 ~~~bash
-mkdir data/bgcflow_output/temp
+mkdir -p data/bgcflow_output/temp
 awk -F'[;\t]' 'NR>1 {print $1","$7}' data/bgcflow_output/gtdbtk.bac120.summary.tsv | sort > data/bgcflow_output/temp/id_genus.csv
 ~~~
 2. Then, we extracted the key column and "bgc_count" column and sorted the output of [df_antismash_7.0.0.summary.csv](data/bgcflow_output/df_antismash_7.0.0_summary.csv) using the command:
@@ -216,4 +218,4 @@ snakemake --snakefile workflow/Snakefile --use-conda --keep-going --rerun-incomp
 This will download the assembly Fasta and the Fastq SRAs, and use the short read to calculate the base accuracy of the assembly.
 
 ## Running the notebooks
-To run the Jupyter notebooks, start the server by running `jupyter lab`.
+To run the Jupyter notebooks, start the server by running `jupyter lab` and access the notebooks in the `src/notebooks` directory.
